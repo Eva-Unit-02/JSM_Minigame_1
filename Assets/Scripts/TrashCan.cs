@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Drawer : MonoBehaviour
+public class TrashCan : MonoBehaviour
 {
-    public int num;
     private SpriteRenderer sp;
     private Color baseColor;
 
@@ -17,10 +16,10 @@ public class Drawer : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
         
-        if (!collision.gameObject.CompareTag("PaperHitBox")) return;
+        // if (!collision.gameObject.CompareTag("PaperHitBox")) return;
 
         
-        Draggable draggable = collision.transform.parent.GetComponent<Draggable>();
+        Draggable draggable = collision.gameObject.GetComponent<Draggable>();
         if (draggable != null)
         {
             sp.color = Color.white;
@@ -28,7 +27,7 @@ public class Drawer : MonoBehaviour
             if (!draggable.IsMouseDown())
             {
                 Destroy(draggable.gameObject);
-                Debug.Log($"Object stored in the drawer {num}");
+                Debug.Log($"Object stored in Trash Can");
             }
             
         }
