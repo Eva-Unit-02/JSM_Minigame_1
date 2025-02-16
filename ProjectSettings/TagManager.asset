@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - PaperHitBox
+  - GameManager
   layers:
   - Default
   - TransparentFX

@@ -9,7 +9,7 @@ public class Draggable : MonoBehaviour
     private Vector3 mousePositionOffset;
     private SpriteRenderer spriteRenderer;
     private BoxCollider2D coll;
-    private bool startDrag;
+    public bool startDrag;
 
     private void Start()
     {
@@ -23,49 +23,67 @@ public class Draggable : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (startDrag)
         {
-            Collider2D[] collidersHit = Physics2D.OverlapPointAll(GetMouseWorldPositon());
-
-            // Check if current collider is being hit
-            if (!collidersHit.Contains(coll)) return;
-
-            foreach (Collider2D collider in collidersHit)
+            transform.position = GetMouseWorldPositon() + mousePositionOffset;
+            if (Input.GetMouseButtonDown(0))
             {
-                if (!collider.gameObject.GetComponent<Draggable>()) continue;
-
-                SpriteRenderer otherRenderer = collider.GetComponent<SpriteRenderer>();
-
-                // Skip if the other collider doesn't have a SpriteRenderer
-                if (otherRenderer == null)
-                    continue;
-
-                // Compare Sorting Layers
-                if (otherRenderer.sortingLayerID > spriteRenderer.sortingLayerID)
-                    return; // Other object is on a higher Sorting Layer
-
-                // If Sorting Layers are the same, compare Order in Layer
-                if (otherRenderer.sortingLayerID == spriteRenderer.sortingLayerID &&
-                    otherRenderer.sortingOrder > spriteRenderer.sortingOrder)
-                    return; // Other object is on a higher Order in Layer
-            }
-
-            // This object is the topmost
-            startDrag = true;
-            mousePositionOffset = transform.position - GetMouseWorldPositon();
-        }
-
-        if (Input.GetMouseButton(0))
-        {
-            if (startDrag)
-            {
-                transform.position = GetMouseWorldPositon() + mousePositionOffset;
+                startDrag = false;
+                return;
             }
         }
-        else if (Input.GetMouseButtonUp(0))
+
+        if (!startDrag)
         {
-            startDrag = false;
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                Collider2D[] collidersHit = Physics2D.OverlapPointAll(GetMouseWorldPositon());
+
+                // Check if current collider is being hit
+                if (!collidersHit.Contains(coll)) return;
+
+                foreach (Collider2D collider in collidersHit)
+                {
+                    if (!collider.gameObject.GetComponent<Draggable>()) continue;
+
+                    SpriteRenderer otherRenderer = collider.GetComponent<SpriteRenderer>();
+
+                    // Skip if the other collider doesn't have a SpriteRenderer
+                    if (otherRenderer == null)
+                        continue;
+
+                    // Compare Sorting Layers
+                    if (otherRenderer.sortingLayerID > spriteRenderer.sortingLayerID)
+                        return; // Other object is on a higher Sorting Layer
+
+                    // If Sorting Layers are the same, compare Order in Layer
+                    if (otherRenderer.sortingLayerID == spriteRenderer.sortingLayerID &&
+                        otherRenderer.sortingOrder > spriteRenderer.sortingOrder)
+                        return; // Other object is on a higher Order in Layer
+                }
+
+                // This object is the topmost
+                startDrag = true;
+                mousePositionOffset = transform.position - GetMouseWorldPositon();
+            }
         }
+
+        // if (Input.GetMouseButton(0))
+        // {
+            // if (startDrag)
+            // {
+            //     transform.position = GetMouseWorldPositon() + mousePositionOffset;
+            //     // if (Input.GetMouseButtonUp(0))
+            //     // {
+            //     //     startDrag = false;
+            //     // }
+            // }
+        // }
+        // else if (Input.GetMouseButtonUp(0))
+        // {
+        //     startDrag = false;
+        // }
     }
 
     public bool IsMouseDown()
