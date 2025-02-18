@@ -11,25 +11,30 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public int topOrder = 5;
+    public int topOrder = 6;
     public int[] distances;
     public GameObject[] papers;
     public float moveSpeed;
     public int reputation = 100;
     public TextMeshProUGUI reputationDisplay;
-    public int money = 100;
-    public TextMeshProUGUI moneyDisplay;
-    private float timer = 0f;
+    public int time = 100;
+    public TextMeshProUGUI timeDisplay;
+    public float timer;
+    private float spawnTimer = 0f;
     public GameObject gameOverScreen;
     private float initialSpawnInterval = 2.0f;
     private float spawnInterval = 1.5f;
+
+    public event Action OnPaperAdded;
+
     void Update()
     {
-        timer += Time.deltaTime;
+        spawnTimer += Time.deltaTime;
+        timer -= Time.deltaTime;
         
-        if (timer >= spawnInterval)
+        if (spawnTimer >= spawnInterval)
         {
-            timer = 0;
+            spawnTimer = 0;
 
             // spawnInterval = initialSpawnInterval / Mathf.Pow(Mathf.Log(topOrder, 2), 2);
             if (spawnInterval >= 1f) spawnInterval -= 0.05f;
@@ -37,10 +42,19 @@ public class GameManager : MonoBehaviour
             Vector2 spawnPosition = GetRandomPositionOnScreen();
             GameObject newPrefab = Instantiate(papers[Random.Range(0, papers.Length)], spawnPosition + new Vector2(0, Camera.main.orthographicSize * 2), Quaternion.identity);
             newPrefab.GetComponent<SpriteRenderer>().sortingOrder = topOrder;
-            topOrder++;
+            // Setting order for shadow
+            newPrefab.transform.GetChild(1).GetComponent<SpriteRenderer>().sortingOrder = topOrder-1;
+            topOrder += 2;
+            OnPaperAdded.Invoke();
             StartCoroutine(MovePrefab(newPrefab, spawnPosition));
         }
 
+        timeDisplay.text = "Time: " + timer.ToString("0.00");
+
+        if (timer <= 0)
+        {
+            gameOverScreen.SetActive(true);
+        }
     }
 
     
@@ -80,15 +94,6 @@ public class GameManager : MonoBehaviour
             // Wait for the next frame
             yield return null;
         }
-
-        // Optionally, destroy the prefab when it reaches the target position
-        // Destroy(prefab);
-    }
-
-    public void ChangeMoney(int amt)
-    {
-        money += amt;
-        moneyDisplay.text = "Money: " + money;
 
     }
 

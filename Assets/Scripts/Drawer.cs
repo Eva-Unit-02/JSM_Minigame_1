@@ -35,19 +35,16 @@ public class Drawer : MonoBehaviour
                 if (draggable.GetComponent<Document>().type == this.type)
                 {
                     Debug.Log($"CORRECT!!! Object stored in the drawer {num}");
-                    gameManager.ChangeMoney(5);
                     // gameManager.ChangeReputation(5);
                 } 
                 else
                 {
                     Debug.Log($"WRONG!!! Object stored in the drawer {num}");
-                    gameManager.ChangeMoney(-10);
                     gameManager.ChangeReputation(-5);
                 }
                 Destroy(draggable.gameObject);
                 
             }
-            
         }
     }
 
